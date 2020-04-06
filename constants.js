@@ -1,4 +1,3 @@
-const PATH_RADIUS = 20;
-const BALL_RADIUS = 2;
-const BALL_ANGLE_DT = Math.PI / 50;
-const PERIOD_SCENES_OFFSET_Y = 2.5 * PATH_RADIUS;
+const DT = 0.04;
+const FRAME_REFRESH_PERIOD = 0.03;
+const HORIZONTAL_OFFSET = 200;

@@ -1,43 +1,42 @@
 const canvasWidth = window.innerWidth;
 const canvasHeight = window.innerHeight;
 
-const dt = 0.03;
 let ctx;
+let t;
 
-var periodScenes = [];
+let sinFunctions = [];
 
 function setup() {
     createCanvas(canvasWidth, canvasHeight);
     ctx = document.getElementById("defaultCanvas0").getContext("2d");
-    frameRate(1/dt);
+    frameRate(1 / FRAME_REFRESH_PERIOD);
 
-    let pathOriginX = PATH_RADIUS;
-    let pathOriginY = PATH_RADIUS;
-    for (var i = 1; i <= 10; ++i) {
-        periodScenes.push(new PeriodScene(cos(i) + sin(i), pathOriginX, pathOriginY, PATH_RADIUS, BALL_RADIUS));
+    for (var i = 0; i <= 3; ++i) {
+        n = 2 * i + 1;
+        sinFunctions.push(new SinFunction(4 / (n * Math.PI), n));
     }
+
+    t = 0;
 }
 
 function draw() {
-    background(230);
-    ctx.translate(20, 20);
+    t += DT;
 
-    for (var i = 0; i < periodScenes.length; ++i) {
-        if (i > 0 && i < 10) {
-            ctx.translate(0, PERIOD_SCENES_OFFSET_Y);
-        }
-        periodScenes[i].updateState();
-        if (i < 10) {
-            periodScenes[i].drawPeriodScene();
-        }
+    background(230);
+    ctx.translate(150, 150);
+
+    for (var i = 0; i < sinFunctions.length; ++i) {
+        ctx.translate(0, 5 * sinFunctions[i].getAmplitude() * Math.min(i, 1));
+        sinFunctions[i].drawFunction(t);
     }
 
+    ctx.translate(0, 200);
     drawSum();
 }
 
 function drawSum() {
     ctx.save();
-    ctx.translate(periodScenes[0].getVerticalAxisOriginX(), 50 + 2 * PERIOD_SCENES_OFFSET_Y);
+    ctx.translate(HORIZONTAL_OFFSET, 0);
 
     ctx.beginPath();
     for (var i = 0; i < canvasWidth; ++i) {
@@ -51,6 +50,6 @@ function drawSum() {
 
 function computeVerticalSumPosition(i) {
     var sum = 0;
-    periodScenes.forEach(p => sum += p.getVerticalBallPositionAt(i));
-    return 5 * sum / periodScenes.length;
+    sinFunctions.forEach(f => sum += f.getVerticalBallYPositionAt(i));
+    return 2 * sum / sinFunctions.length;
 }
