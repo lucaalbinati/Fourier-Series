@@ -13,10 +13,9 @@ function setup() {
 
     let pathOriginX = PATH_RADIUS;
     let pathOriginY = PATH_RADIUS;
-    periodScenes.push(new PeriodScene(1, pathOriginX, pathOriginY, PATH_RADIUS, BALL_RADIUS));
-    periodScenes.push(new PeriodScene(2, pathOriginX, pathOriginY, PATH_RADIUS, BALL_RADIUS));
-    periodScenes.push(new PeriodScene(3, pathOriginX, pathOriginY, PATH_RADIUS, BALL_RADIUS));
-    periodScenes.push(new PeriodScene(5, pathOriginX, pathOriginY, PATH_RADIUS, BALL_RADIUS));
+    for (var i = 1; i <= 10; ++i) {
+        periodScenes.push(new PeriodScene(cos(i) + sin(i), pathOriginX, pathOriginY, PATH_RADIUS, BALL_RADIUS));
+    }
 }
 
 function draw() {
@@ -24,11 +23,13 @@ function draw() {
     ctx.translate(20, 20);
 
     for (var i = 0; i < periodScenes.length; ++i) {
-        if (i > 0) {
+        if (i > 0 && i < 10) {
             ctx.translate(0, PERIOD_SCENES_OFFSET_Y);
         }
         periodScenes[i].updateState();
-        periodScenes[i].drawPeriodScene();
+        if (i < 10) {
+            periodScenes[i].drawPeriodScene();
+        }
     }
 
     drawSum();
@@ -51,5 +52,5 @@ function drawSum() {
 function computeVerticalSumPosition(i) {
     var sum = 0;
     periodScenes.forEach(p => sum += p.getVerticalBallPositionAt(i));
-    return 3 * sum / periodScenes.length;
+    return 5 * sum / periodScenes.length;
 }
