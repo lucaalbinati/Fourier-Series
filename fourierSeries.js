@@ -12,7 +12,7 @@ class FourierSeries {
         }
     }
 
-    updateState(t) {
+    updateFourierSeries(t) {
         this.sinFunctions.forEach(f => f.updateState(t));
     }
 

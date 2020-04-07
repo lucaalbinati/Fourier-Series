@@ -20,7 +20,7 @@ function setup() {
 function draw() {
     // update
     t += DT;
-    series.updateState(t);
+    series.updateFourierSeries(t);
 
     // draw
     ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
