@@ -23,18 +23,21 @@ class SinFunction {
         this.verticalBallYPositions.unshift(this.ballY);
     }
 
-    drawFunction(t) {
+    drawFunction(t, withSinusoid = true) {
         ctx.save();
 
-        this.drawConnectBalls();
+        if (withSinusoid) {
+            this.drawConnectBalls();
+        }
         this.drawCircle();
         this.drawBall();
 
-        ctx.translate(HORIZONTAL_OFFSET, 0);
-        this.drawVerticalAxis();
-        this.drawBallLine();
-        this.drawBallOnVerticalAxis();
-
+        if (withSinusoid) {
+            ctx.translate(HORIZONTAL_OFFSET, 0);
+            this.drawVerticalAxis();
+            this.drawBallLine();
+            this.drawBallOnVerticalAxis();
+        }
 
         ctx.restore();
     }
