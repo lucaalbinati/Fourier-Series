@@ -1,55 +1,30 @@
-const canvasWidth = window.innerWidth;
-const canvasHeight = window.innerHeight;
+const CANVAS_WIDTH = window.innerWidth;
+const CANVAS_HEIGHT = window.innerHeight;
 
 let ctx;
 let t;
 
-let sinFunctions = [];
+let series;
+let nbFourierTerms = 5;
 
 function setup() {
-    createCanvas(canvasWidth, canvasHeight);
+    createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
     ctx = document.getElementById("defaultCanvas0").getContext("2d");
     frameRate(1 / FRAME_REFRESH_PERIOD);
 
-    for (var i = 0; i <= 3; ++i) {
-        n = 2 * i + 1;
-        sinFunctions.push(new SinFunction(4 / (n * Math.PI), n));
-    }
-
+    // initialize
     t = 0;
+    series = FourierSeries.createSawToothFourierSeries(nbFourierTerms);
 }
 
 function draw() {
+    // update
     t += DT;
+    series.updateState(t);
 
-    background(230);
-    ctx.translate(150, 150);
+    // draw
+    ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-    for (var i = 0; i < sinFunctions.length; ++i) {
-        ctx.translate(0, 5 * sinFunctions[i].getAmplitude() * Math.min(i, 1));
-        sinFunctions[i].drawFunction(t);
-    }
-
-    ctx.translate(0, 200);
-    drawSum();
-}
-
-function drawSum() {
-    ctx.save();
-    ctx.translate(HORIZONTAL_OFFSET, 0);
-
-    ctx.beginPath();
-    for (var i = 0; i < canvasWidth; ++i) {
-        ctx.lineTo(3 * i, computeVerticalSumPosition(i));
-    }
-    ctx.stroke();
-    ctx.closePath();
-
-    ctx.restore();
-}
-
-function computeVerticalSumPosition(i) {
-    var sum = 0;
-    sinFunctions.forEach(f => sum += f.getVerticalBallYPositionAt(i));
-    return 2 * sum / sinFunctions.length;
+    ctx.translate(100, 150);
+    series.drawFourierSeries();
 }

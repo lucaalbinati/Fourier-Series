@@ -8,29 +8,33 @@ class SinFunction {
             this.ballRadius = 1;
         }
         this.verticalBallYPositions = [];
+        this.x = 0;
+        this.y = 0;
+        this.ballX = 0;
+        this.ballY = 0;
+    }
+
+    updateState(t) {
+        this.y = this.computeFt(t);
+        this.x = this.computeX(t);
+        this.ballY = this.y * this.amplitude;
+        this.ballX = this.x * this.amplitude;
+
+        this.verticalBallYPositions.unshift(this.ballY);
     }
 
     drawFunction(t) {
         ctx.save();
 
-        let ft = this.computeFt(t);
-        let y = ft;
-        let x = this.computeX(t, y);
-        let ballY = y * this.amplitude;
-        let ballX = x * this.amplitude;
-
-        this.verticalBallYPositions.unshift(ballY);
-
-        this.drawConnectBalls(ballX, ballY);
-
+        this.drawConnectBalls();
         this.drawCircle();
-        this.drawBall(ballX, ballY);
+        this.drawBall();
 
         ctx.translate(HORIZONTAL_OFFSET, 0);
         this.drawVerticalAxis();
-        this.drawBallOnVerticalAxis(ballY);
-
         this.drawBallLine();
+        this.drawBallOnVerticalAxis();
+
 
         ctx.restore();
     }
@@ -48,20 +52,20 @@ class SinFunction {
         ctx.restore();
     }
 
-    drawConnectBalls(ballX, ballY) {
+    drawConnectBalls() {
         ctx.save();
-        ctx.translate(ballX, ballY);
+        ctx.translate(this.ballX, this.ballY);
         ctx.beginPath();
         ctx.lineTo(0,0);
-        ctx.lineTo(- ballX + HORIZONTAL_OFFSET, 0);
+        ctx.lineTo(- this.ballX + HORIZONTAL_OFFSET, 0);
         ctx.stroke();
         ctx.closePath();
         ctx.restore();
     }
 
-    drawBall(ballX, ballY) {
+    drawBall() {
         ctx.save();
-        ctx.translate(ballX, ballY);
+        ctx.translate(this.ballX, this.ballY);
         ctx.beginPath();
         ctx.arc(0, 0, this.ballRadius, 0, 2 * Math.PI);
         ctx.fillStyle = "red";
@@ -74,8 +78,8 @@ class SinFunction {
         return - Math.sin(this.period * t);
     }
 
-    computeX(t, y) {
-        let val = Math.sqrt(1 - y * y);
+    computeX(t) {
+        let val = Math.sqrt(1 - this.y * this.y);
 
         let piPeriod = (2 * Math.PI / this.period);
         let periodMod = t % piPeriod;
@@ -99,10 +103,14 @@ class SinFunction {
         ctx.restore();
     }
 
-    drawBallOnVerticalAxis(ballY) {
+    drawBallOnVerticalAxis() {
         ctx.save();
-        ctx.translate(0, ballY);
-        this.drawBall(0, 0);
+        ctx.translate(0, this.ballY);
+        ctx.beginPath();
+        ctx.arc(0, 0, this.ballRadius, 0, 2 * Math.PI);
+        ctx.fillStyle = "red";
+        ctx.fill();
+        ctx.closePath();
         ctx.restore();
     }
 
