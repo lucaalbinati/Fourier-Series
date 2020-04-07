@@ -24,7 +24,5 @@ function draw() {
 
     // draw
     ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-
-    ctx.translate(100, 150);
     series.drawFourierSeries();
 }

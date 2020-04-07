@@ -1,5 +1,8 @@
 class FourierSeries {
     constructor(constantTerm, outsideFunc, insideFunc, limit) {
+        if (limit < 1) {
+            throw "Limit must be greater or equal than 1";
+        }
         this.sinFunctions = [];
 
         for (let i = 0; i < limit; ++i) {
@@ -14,8 +17,10 @@ class FourierSeries {
     }
 
     drawFourierSeries() {
+        ctx.save();
+        ctx.translate(1.5 * this.sinFunctions[0].getAmplitude(), VERTICAL_OFFSET + this.sinFunctions[0].getAmplitude());
         this.drawSum();
-        ctx.translate(0, 250);
+        ctx.translate(0, VERTICAL_OFFSET + 2 * this.sinFunctions[0].getAmplitude());
 
         for (var i = 0; i < this.sinFunctions.length; ++i) {
             if (i > 0) {
@@ -24,6 +29,7 @@ class FourierSeries {
             }
             this.sinFunctions[i].drawFunction(t);
         }
+        ctx.restore();
     }
 
     drawSum() {
@@ -41,9 +47,11 @@ class FourierSeries {
     }
 
     computeVerticalSumPosition(i) {
+        let maxSum = 0
+        this.sinFunctions.forEach(f => maxSum += f.getAmplitude());
         let sum = 0;
         this.sinFunctions.forEach(f => sum += f.getVerticalBallYPositionAt(i));
-        return sum;
+        return 2 * this.sinFunctions[0].getAmplitude() * sum / maxSum;
     }
 
     static createStepFourierSeries(nbFourierTerms) {
