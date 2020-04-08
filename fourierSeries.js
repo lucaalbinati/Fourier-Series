@@ -47,11 +47,15 @@ class FourierSeries {
     }
 
     computeVerticalSumPosition(i) {
-        let maxSum = 0
-        this.sinFunctions.forEach(f => maxSum += f.getAmplitude());
         let sum = 0;
         this.sinFunctions.forEach(f => sum += f.getVerticalBallYPositionAt(i));
-        return 2 * this.sinFunctions[0].getAmplitude() * sum / maxSum;
+        return 2 * this.sinFunctions[0].getAmplitude() * sum / this.computeMaxSum();
+    }
+
+    computeMaxSum() {
+        let maxSum = 0;
+        this.sinFunctions.forEach(f => maxSum += f.getAmplitude());
+        return maxSum;
     }
 
     static createStepFourierSeries(nbFourierTerms) {
