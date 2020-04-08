@@ -1,12 +1,12 @@
 class FourierSeries {
-    constructor(constantTerm, outsideFunc, insideFunc, limit) {
+    constructor(outsideFunc, insideFunc, limit) {
         if (limit < 1) {
             throw "Limit must be greater or equal than 1";
         }
         this.sinFunctions = [];
 
         for (let i = 0; i < limit; ++i) {
-            let amplitude = constantTerm * outsideFunc(i);
+            let amplitude = outsideFunc(i);
             let period = insideFunc(i);
             this.sinFunctions.push(new SinFunction(amplitude, period));
         }
@@ -55,10 +55,10 @@ class FourierSeries {
     }
 
     static createStepFourierSeries(nbFourierTerms) {
-        return new FourierSeries(4 / Math.PI, i => 1 / (2 * i + 1), i => 2 * i + 1, nbFourierTerms);
+        return new FourierSeries(i => 4 / (Math.PI * (2 * i + 1)), i => 2 * i + 1, nbFourierTerms);
     }
 
     static createSawToothFourierSeries(nbFourierTerms) {
-        return new FourierSeries(2 / Math.PI, i => 1 / (i + 1), i => i + 1, nbFourierTerms);
+        return new FourierSeries(i => 2 / (Math.PI * (i + 1)), i => i + 1, nbFourierTerms);
     }
 }
