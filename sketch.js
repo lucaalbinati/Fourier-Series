@@ -5,7 +5,7 @@ let ctx;
 let t;
 
 let series;
-let nbFourierTerms = 5;
+let nbFourierTerms = 2;
 
 function setup() {
     createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
@@ -15,6 +15,7 @@ function setup() {
     // initialize
     t = 0;
     series = FourierSeries.createSawToothFourierSeries(nbFourierTerms);
+    //series = FourierSeries.createStepFourierSeries(nbFourierTerms);
 }
 
 function draw() {
