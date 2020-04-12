@@ -18,6 +18,7 @@ class FourierSeries {
 
     drawFourierSeries() {
         ctx.save();
+        let combined = false;
 
         let centerX = VERTICAL_OFFSET + this.sinFunctions[0].getAmplitude();
         let centerY = VERTICAL_OFFSET + this.sinFunctions[0].getAmplitude();
@@ -28,29 +29,58 @@ class FourierSeries {
         let nextRelativeX = 0;
         let nextRelativeY = 0;
         for (let i = 0; i < this.sinFunctions.length; ++i) {
-            currRelativeX = nextRelativeX;
-            currRelativeY = nextRelativeY;
-            nextRelativeX += this.sinFunctions[i].getBallX();
-            nextRelativeY += this.sinFunctions[i].getBallY();
+            if (combined) {
+                currRelativeX = nextRelativeX;
+                currRelativeY = nextRelativeY;
+                nextRelativeX += this.sinFunctions[i].getBallX();
+                nextRelativeY += this.sinFunctions[i].getBallY();
 
-            this.sinFunctions[i].drawConnectBalls(0,    0, currRelativeX, currRelativeY, nextRelativeX, nextRelativeY);
-            this.sinFunctions[i].drawCircle(currRelativeX, currRelativeY);
-            this.sinFunctions[i].drawBall(currRelativeX, currRelativeY);
+                this.sinFunctions[i].drawConnectBalls(0, 0, currRelativeX, currRelativeY, nextRelativeX, nextRelativeY);
+                this.sinFunctions[i].drawCircle(currRelativeX, currRelativeY);
+                this.sinFunctions[i].drawBall(currRelativeX, currRelativeY);
+            } else {
+                currRelativeX = 0;
+                currRelativeY = 0;
+                nextRelativeX = this.sinFunctions[i].getBallX();
+                nextRelativeY = this.sinFunctions[i].getBallY();
+
+                this.sinFunctions[i].drawConnectBalls(0, 0, currRelativeX, currRelativeY, nextRelativeX, nextRelativeY);
+                this.sinFunctions[i].drawCircle(currRelativeX, currRelativeY);
+                this.sinFunctions[i].drawBall(currRelativeX, currRelativeY);
+                this.sinFunctions[i].drawVerticalAxis(HORIZONTAL_OFFSET + this.computeCombinedAmplitude(), 0, this.sinFunctions[i].getAmplitude());
+                this.sinFunctions[i].drawConnectBalls(0, 0, nextRelativeX, nextRelativeY, HORIZONTAL_OFFSET + this.computeCombinedAmplitude(), nextRelativeY);
+                this.drawSum(HORIZONTAL_OFFSET + this.computeCombinedAmplitude(), 0, combined, i);
+                this.sinFunctions[i].drawBallOnVerticalAxis(HORIZONTAL_OFFSET + this.computeCombinedAmplitude(), nextRelativeY);
+                if (i < this.sinFunctions.length - 1) {
+                    ctx.translate(0, VERTICAL_OFFSET + this.sinFunctions[i].getAmplitude() + this.sinFunctions[i + 1].getAmplitude());
+                }
+            }
         }
 
-        this.sinFunctions[0].drawConnectBalls(0, 0, nextRelativeX, nextRelativeY, HORIZONTAL_OFFSET + this.computeCombinedAmplitude(), nextRelativeY);
-        this.sinFunctions[0].drawVerticalAxis(HORIZONTAL_OFFSET + this.computeCombinedAmplitude(), 0, this.computeCombinedAmplitude());
-        this.drawSum(HORIZONTAL_OFFSET + this.computeCombinedAmplitude(), 0);
-        this.sinFunctions[0].drawBallOnVerticalAxis(HORIZONTAL_OFFSET + this.computeCombinedAmplitude(), nextRelativeY);
+        if (combined) {
+            this.sinFunctions[0].drawConnectBalls(0, 0, nextRelativeX, nextRelativeY, HORIZONTAL_OFFSET + this.computeCombinedAmplitude(), nextRelativeY);
+            this.sinFunctions[0].drawVerticalAxis(HORIZONTAL_OFFSET + this.computeCombinedAmplitude(), 0, this.computeCombinedAmplitude());
+            this.drawSum(HORIZONTAL_OFFSET + this.computeCombinedAmplitude(), 0, combined);
+            this.sinFunctions[0].drawBallOnVerticalAxis(HORIZONTAL_OFFSET + this.computeCombinedAmplitude(), nextRelativeY);
+        } else {
+            ctx.translate(0, 150);
+            this.sinFunctions[0].drawVerticalAxis(HORIZONTAL_OFFSET + this.computeCombinedAmplitude(), 0, this.computeCombinedAmplitude());
+            this.drawSum(HORIZONTAL_OFFSET + this.computeCombinedAmplitude(), 0, true);
+            this.sinFunctions[0].drawBallOnVerticalAxis(HORIZONTAL_OFFSET + this.computeCombinedAmplitude(), this.computeVerticalSumPosition(0));
+        }
     }
 
-    drawSum(centerX, centerY) {
+    drawSum(centerX, centerY, combined, sinFuncIdx = 0) {
         ctx.save();
         ctx.translate(centerX, centerY);
 
         ctx.beginPath();
         for (var i = 0; i < CANVAS_WIDTH; ++i) {
-            ctx.lineTo(3 * i, this.computeVerticalSumPosition(i));
+            if (combined) {
+                ctx.lineTo(3 * i, this.computeVerticalSumPosition(i));
+            } else {
+                ctx.lineTo(3 * i, this.sinFunctions[sinFuncIdx].getVerticalBallYPositionAt(i));
+            }
         }
         ctx.stroke();
         ctx.closePath();
