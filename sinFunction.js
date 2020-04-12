@@ -23,27 +23,9 @@ class SinFunction {
         this.verticalBallYPositions.unshift(this.ballY);
     }
 
-    drawFunction(t, withSinusoid = true) {
+    drawCircle(centerX, centerY) {
         ctx.save();
-
-        if (withSinusoid) {
-            this.drawConnectBalls();
-        }
-        this.drawCircle();
-        this.drawBall();
-
-        if (withSinusoid) {
-            ctx.translate(HORIZONTAL_OFFSET, 0);
-            this.drawVerticalAxis();
-            this.drawBallLine();
-            this.drawBallOnVerticalAxis();
-        }
-
-        ctx.restore();
-    }
-
-    drawCircle() {
-        ctx.save();
+        ctx.translate(centerX, centerY);
 
         ctx.beginPath();
         ctx.arc(0, 0, this.circleRadius, 0, 2 * Math.PI);
@@ -55,19 +37,20 @@ class SinFunction {
         ctx.restore();
     }
 
-    drawConnectBalls() {
+    drawConnectBalls(centerX, centerY, ballX1, ballY1, ballX2, ballY2) {
         ctx.save();
-        ctx.translate(this.ballX, this.ballY);
+        ctx.translate(centerX, centerY);
         ctx.beginPath();
-        ctx.lineTo(0,0);
-        ctx.lineTo(- this.ballX + HORIZONTAL_OFFSET, 0);
+        ctx.lineTo(ballX1, ballY1);
+        ctx.lineTo(ballX2, ballY2);
         ctx.stroke();
         ctx.closePath();
         ctx.restore();
     }
 
-    drawBall() {
+    drawBall(centerX, centerY) {
         ctx.save();
+        ctx.translate(centerX, centerY);
         ctx.translate(this.ballX, this.ballY);
         ctx.beginPath();
         ctx.arc(0, 0, this.ballRadius, 0, 2 * Math.PI);
@@ -94,11 +77,12 @@ class SinFunction {
         }
     }
 
-    drawVerticalAxis() {
+    drawVerticalAxis(centerX, centerY, height) {
         ctx.save();
+        ctx.translate(centerX, centerY);
         ctx.beginPath();
-        ctx.lineTo(0, - this.circleRadius);
-        ctx.lineTo(0, this.circleRadius);
+        ctx.lineTo(0, - height);
+        ctx.lineTo(0, height);
         ctx.lineWidth = 1;
         ctx.strokeStyle = "grey";
         ctx.stroke();
@@ -106,24 +90,13 @@ class SinFunction {
         ctx.restore();
     }
 
-    drawBallOnVerticalAxis() {
+    drawBallOnVerticalAxis(centerX, centerY) {
         ctx.save();
-        ctx.translate(0, this.ballY);
+        ctx.translate(centerX, centerY);
         ctx.beginPath();
         ctx.arc(0, 0, this.ballRadius, 0, 2 * Math.PI);
         ctx.fillStyle = "red";
         ctx.fill();
-        ctx.closePath();
-        ctx.restore();
-    }
-
-    drawBallLine() {
-        ctx.save();
-        ctx.beginPath();
-        for (var i = 0; i < this.verticalBallYPositions.length; ++i) {
-            ctx.lineTo(3 * i, this.verticalBallYPositions[i]);
-        }
-        ctx.stroke();
         ctx.closePath();
         ctx.restore();
     }
@@ -134,6 +107,14 @@ class SinFunction {
 
     getVerticalBallYPositionAt(i) {
         return this.verticalBallYPositions[i];
+    }
+
+    getBallX() {
+        return this.ballX;
+    }
+
+    getBallY() {
+        return this.ballY;
     }
 
 }

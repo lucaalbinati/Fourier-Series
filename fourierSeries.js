@@ -16,29 +16,86 @@ class FourierSeries {
         this.sinFunctions.forEach(f => f.updateState(t));
     }
 
-    drawFourierSeries() {
-        ctx.save();
-        ctx.translate(1.5 * this.sinFunctions[0].getAmplitude(), VERTICAL_OFFSET + this.sinFunctions[0].getAmplitude());
-        this.drawSum();
-        ctx.translate(0, VERTICAL_OFFSET + 2 * this.sinFunctions[0].getAmplitude());
-
-        for (var i = 0; i < this.sinFunctions.length; ++i) {
-            if (i > 0) {
-                let offset = this.sinFunctions[i-1].getAmplitude() + this.sinFunctions[i].getAmplitude() + VERTICAL_OFFSET;
-                ctx.translate(0, offset);
-            }
-            this.sinFunctions[i].drawFunction(t);
+    drawFourierSeries(combineTable) {
+        if (combineTable.length !== this.sinFunctions.length - 1) {
+            throw "'combine' table must be of size one less than the number of sin functions";
         }
+
+        if (combineTable.length === 1) {
+            combineTable[0] = true
+        }
+
+        ctx.save();
+        let centerX = VERTICAL_OFFSET + this.sinFunctions[0].getAmplitude();
+        let centerY = VERTICAL_OFFSET + this.sinFunctions[0].getAmplitude();
+        ctx.translate(centerX, centerY);
+
+        // draw the summed function in the beginning (unless all values are 'true' in which case it will be drawn anyway)
+        if (!combineTable.every(c => c)) {
+            this.sinFunctions[0].drawVerticalAxis(HORIZONTAL_OFFSET + this.computeCombinedAmplitude(), 0, this.computeCombinedAmplitude());
+            this.drawSum(HORIZONTAL_OFFSET + this.computeCombinedAmplitude(), 0);
+            this.sinFunctions[0].drawBallOnVerticalAxis(HORIZONTAL_OFFSET + this.computeCombinedAmplitude(), this.computeVerticalSumPosition(0));
+            ctx.translate(0, 2 * this.computeCombinedAmplitude());
+        }
+
+        for (let i = 0; i < combineTable.length; ++i) {
+            let beginIdx = i;
+
+            if (combineTable[i]) {
+                while (combineTable[i]) {
+                    i++;
+                }
+            }
+
+            let endIdx = i;
+
+            this.drawFourierSeriesWithIndices(beginIdx, endIdx);
+
+            if (!combineTable[i]) {
+                ctx.translate(0, 2 * VERTICAL_OFFSET + this.computeCombinedAmplitude(beginIdx, endIdx));
+            }
+        }
+
+        // make sure the last element gets drawed, in the case the last value of 'combine' is false
+        if (!combineTable[combineTable.length - 1]) {
+            let lastIdx = this.sinFunctions.length - 1;
+            this.drawFourierSeriesWithIndices(lastIdx, lastIdx);
+        }
+
         ctx.restore();
     }
 
-    drawSum() {
+    drawFourierSeriesWithIndices(beginIdx, endIdx) {
         ctx.save();
-        ctx.translate(HORIZONTAL_OFFSET, 0);
+
+        let currRelativeX;
+        let currRelativeY;
+        let nextRelativeX = 0;
+        let nextRelativeY = 0;
+        for (let i = beginIdx; i <= endIdx; ++i) {
+            currRelativeX = nextRelativeX;
+            currRelativeY = nextRelativeY;
+            nextRelativeX += this.sinFunctions[i].getBallX();
+            nextRelativeY += this.sinFunctions[i].getBallY();
+
+            this.sinFunctions[i].drawConnectBalls(0, 0, currRelativeX, currRelativeY, nextRelativeX, nextRelativeY);
+            this.sinFunctions[i].drawCircle(currRelativeX, currRelativeY);
+            this.sinFunctions[i].drawBall(currRelativeX, currRelativeY);
+        }
+
+        this.sinFunctions[beginIdx].drawConnectBalls(0, 0, nextRelativeX, nextRelativeY, HORIZONTAL_OFFSET + this.computeCombinedAmplitude(), nextRelativeY);
+        this.sinFunctions[beginIdx].drawVerticalAxis(HORIZONTAL_OFFSET + this.computeCombinedAmplitude(), 0, this.computeCombinedAmplitude(beginIdx, endIdx));
+        this.drawSum(HORIZONTAL_OFFSET + this.computeCombinedAmplitude(), 0, beginIdx, endIdx);
+        this.sinFunctions[beginIdx].drawBallOnVerticalAxis(HORIZONTAL_OFFSET + this.computeCombinedAmplitude(), nextRelativeY);
+    }
+
+    drawSum(centerX, centerY, beginIdx, endIdx) {
+        ctx.save();
+        ctx.translate(centerX, centerY);
 
         ctx.beginPath();
-        for (var i = 0; i < CANVAS_WIDTH; ++i) {
-            ctx.lineTo(3 * i, this.computeVerticalSumPosition(i));
+        for (let i = 0; i < CANVAS_WIDTH; ++i) {
+            ctx.lineTo(3 * i, this.computeVerticalSumPosition(i, beginIdx, endIdx));
         }
         ctx.stroke();
         ctx.closePath();
@@ -46,16 +103,20 @@ class FourierSeries {
         ctx.restore();
     }
 
-    computeVerticalSumPosition(i) {
+    computeVerticalSumPosition(i, beginIdx = 0, endIdx = this.sinFunctions.length - 1) {
         let sum = 0;
-        this.sinFunctions.forEach(f => sum += f.getVerticalBallYPositionAt(i));
-        return 2 * this.sinFunctions[0].getAmplitude() * sum / this.computeMaxSum();
+        for (let j = beginIdx; j <= endIdx; ++j) {
+            sum += this.sinFunctions[j].getVerticalBallYPositionAt(i);
+        }
+        return sum;
     }
 
-    computeMaxSum() {
-        let maxSum = 0;
-        this.sinFunctions.forEach(f => maxSum += f.getAmplitude());
-        return maxSum;
+    computeCombinedAmplitude(beginIdx = 0, endIdx = this.sinFunctions.length - 1) {
+        let combinedAmplitude = 0;
+        for (let j = beginIdx; j <= endIdx; ++j) {
+            combinedAmplitude += this.sinFunctions[j].getAmplitude();
+        }
+        return combinedAmplitude;
     }
 
     static createStepFourierSeries(nbFourierTerms) {
