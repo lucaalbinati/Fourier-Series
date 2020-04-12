@@ -5,7 +5,7 @@ let ctx;
 let t;
 
 let series;
-let nbFourierTerms = 2;
+let nbFourierTerms = 4;
 
 function setup() {
     createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
@@ -25,5 +25,6 @@ function draw() {
 
     // draw
     ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-    series.drawFourierSeries();
+    let combine = [false, true, false];
+    series.drawFourierSeries(combine);
 }
