@@ -27,7 +27,7 @@ class FourierSeries {
 
         ctx.save();
         let centerX = VERTICAL_OFFSET + this.sinFunctions[0].getAmplitude();
-        let centerY = VERTICAL_OFFSET + this.sinFunctions[0].getAmplitude();
+        let centerY = 1.5 * VERTICAL_OFFSET + this.sinFunctions[0].getAmplitude();
         ctx.translate(centerX, centerY);
 
         // draw the summed function in the beginning (unless all values are 'true' in which case it will be drawn anyway)
@@ -87,6 +87,8 @@ class FourierSeries {
         this.sinFunctions[beginIdx].drawVerticalAxis(HORIZONTAL_OFFSET + this.computeCombinedAmplitude(), 0, this.computeCombinedAmplitude(beginIdx, endIdx));
         this.drawSum(HORIZONTAL_OFFSET + this.computeCombinedAmplitude(), 0, beginIdx, endIdx);
         this.sinFunctions[beginIdx].drawBallOnVerticalAxis(HORIZONTAL_OFFSET + this.computeCombinedAmplitude(), nextRelativeY);
+
+        ctx.restore();
     }
 
     drawSum(centerX, centerY, beginIdx, endIdx) {
